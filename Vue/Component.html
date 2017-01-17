@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Untitled</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <script src="https://cdn.bootcss.com/vue/2.1.8/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue-resource/1.0.3/vue-resource.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <vue-counter v-bind:number="parentNumber"></vue-counter>
+    </div>
+
+    <template id="counterTpl">
+        <div>
+            <div>
+                counter:{{number}}
+            </div>
+            <button type="button" name="button">plus</button>
+            <button type="button" name="button">minus</button>
+        </div>
+    </template>
+</body>
+
+<script type="text/javascript">
+    Vue.component('vue-counter', {
+        template: '#counterTpl',
+        props: ['number'],
+        data: function() {
+            return {
+                number: 0
+            }
+        },
+        methods: {
+            increment: function () {
+                this.
+            }
+        }
+    });
+    var app = new Vue({
+        el: '#app',
+        data: {
+            parentNumber: 1
+        }
+    });
+</script>
+
+</html>

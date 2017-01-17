@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Untitled</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <script src="https://cdn.bootcss.com/vue/2.1.8/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue-resource/1.0.3/vue-resource.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.js"></script>
+    <script src="./scripts/bundle.js"></script>
+</head>
+
+<body>
+    <div id="search">
+        <input v-model="searchContent"></input>
+    </div>
+    <div id=“app-result”>
+        <ul id="example-1">
+            <li v-for="item in items">
+                {{ item.text }}
+            </li>
+        </ul>
+    </div>
+</body>
+
+<script type="text/javascript">
+</script>
+
+</html>

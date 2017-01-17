@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Untitled</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <script src="https://cdn.bootcss.com/vue/2.1.8/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue-resource/1.0.3/vue-resource.min.js"></script>
+    <script src="https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js"></script>
+    <link href="https://fonts.proxy.ustclug.org/css?family=Oswald" rel="stylesheet">
+    <style>
+        @media only screen and (max-width: 320px) {
+            html {
+                font-size: 9px;
+            }
+        }
+
+        @media only screen and (min-width: 320px) and (max-width: 352px) {
+            html {
+                font-size: 10px;
+            }
+        }
+
+        @media only screen and (min-width: 352px) and (max-width: 384px) {
+            html {
+                font-size: 11px;
+            }
+        }
+
+        @media only screen and (min-width: 384px) and (max-width: 416px) {
+            html {
+                font-size: 12px;
+            }
+        }
+
+        @media only screen and (min-width: 416px) and (max-width: 448px) {
+            html {
+                font-size: 13px;
+            }
+        }
+
+        @media only screen and (min-width: 448px) and (max-width: 480px) {
+            html {
+                font-size: 14px;
+            }
+        }
+
+        @media only screen and (min-width: 480px) and (max-width: 512px) {
+            html {
+                font-size: 15px;
+            }
+        }
+
+        @media only screen and (min-width: 512px) and (max-width: 544px) {
+            html {
+                font-size: 16px;
+            }
+        }
+
+        @media only screen and (min-width: 544px) and (max-width: 576px) {
+            html {
+                font-size: 17px;
+            }
+        }
+
+        @media only screen and (min-width: 576px) and (max-width: 608px) {
+            html {
+                font-size: 18px;
+            }
+        }
+
+        @media only screen and (min-width: 608px) and (max-width: 640px) {
+            html {
+                font-size: 19px;
+            }
+        }
+
+        @media only screen and (min-width: 640px) {
+            html {
+                font-size: 20px;
+            }
+        }
+
+        body {
+            background: #EEEEEE;
+        }
+
+        .article-list {
+            padding: 0px;
+        }
+
+        .article-list li {
+            position: relative;
+            list-style: none;
+            margin-bottom: 1rem;
+            background: white;
+            padding: 8px;
+            border-radius: 2px;
+            box-shadow: 1px 1px 8px #9E9E9E;
+        }
+
+        .article-list .title {
+            font-family: "Oswald", "Helvetica Neue",Helvetica,Arial,"Microsoft Yahei","Hiragino Sans GB","Heiti SC","WenQuanYi Micro Hei",sans-serif;
+            font-size: 2.6em;
+            color: white;
+        }
+
+        .article-list .title-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .article-list .title-pic {
+            width: 100%;
+            height: 12rem;
+            overflow: hidden;
+        }
+
+        .article-list .title-pic img {
+            width: 100%;
+        }
+
+        .article-list .desc {
+            font-family: "Oswald", "Helvetica Neue",Helvetica,Arial,"Microsoft Yahei","Hiragino Sans GB","Heiti SC","WenQuanYi Micro Hei",sans-serif;
+            padding-top: 1.25rem;
+            padding-bottom: 1.25rem;
+            line-height: 1.2;
+            font-size: 1.6rem;
+            font-weight: bold;
+            text-shadow: 0px 3px 0px rgba(0, 216, 255, 0.5), 3px 0px 0px rgba(255, 0, 246, 0.5);
+        }
+
+        .article-list .sub-title {
+            font-size: 1.33rem;
+        }
+
+        .article-list .position {
+            font-family: "Helvetica Neue",Helvetica,Arial,"Microsoft Yahei","Hiragino Sans GB","Heiti SC","WenQuanYi Micro Hei",sans-serif;
+            color: rgb(7, 60, 255);
+            float: left;
+            background-color: white;
+            color: black;
+            height: 1.8rem;
+            line-height: 1.8rem;
+            border: 0.3rem solid white;
+            padding: 0rem 0.55rem 0rem 0.55rem;
+        }
+
+        .article-list .topic {
+            font-family: "Helvetica Neue",Helvetica,Arial,"Microsoft Yahei","Hiragino Sans GB","Heiti SC","WenQuanYi Micro Hei",sans-serif;
+            color: rgb(7, 60, 255);
+            float: left;
+            color: white;
+            height: 1.8rem;
+            line-height: 1.8rem;
+            border: 0.3rem solid white;
+            padding: 0rem 0.55rem 0rem 0.55rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <ul class="article-list">
+            <li v-for="(article, index) in articles"  v-on:click="jumpTo(index)">
+                <div class="title-pic">
+                    <img v-bind:src="article.pic_url" />
+                </div>
+                <div class="title-container">
+                    <div class="title">{{ article.title }}</div>
+                    <div class="sub-title">
+                        <div class="position">{{ article.position }}</div>
+                        <div class="topic">{{ article.topic }}</div>
+                    </div>
+                </div>
+
+                <div class="desc">{{ article.desc }}</div>
+            </li>
+        </ul>
+    </div>
+</body>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var scal = $(window).width() / 640;
+        $('html').css('font-size', 20 * scal + 'px');
+    });
+
+    function initVM() {
+        return new Vue({
+            el: '#container',
+            data: {
+                articles: []
+            },
+            methods: {
+              jumpTo: function (index) {
+                location.href = this.articles[index].link;
+              }
+            }
+        })
+    }
+
+    var vm = initVM();
+    vm.articles = [{
+        title: '2017-1-7',
+        position: '深圳蛇口价值工厂',
+        topic: 'TRONICA',
+        pic_url: './25934080923_aa45c6cb65_b.jpg',
+        desc: '你好LINE UP: Yellow Claw/Slushii/Jewelz & Sparks',
+        link: 'https://www.baidu.com'
+    }, {
+        title: '2017-1-7',
+        position: '上海Myst',
+        topic: 'Myst派对',
+        pic_url: './26879141641_f7475b3c51_b.jpg',
+        desc: '哈喽LINE UP: Diplo',
+        link: 'https://www.google.com'
+    }];
+</script>
+
+</html>
