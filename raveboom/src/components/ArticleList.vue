@@ -17,7 +17,7 @@
         </li>
       </ul>
       <div slot="top" class="mint-loadmore-top">
-        <span v-show="topStatus !== 'loading'" :class="{ 'is-rotate': topStatus !== 'drop' }">↓</span>
+        <span v-show="topStatus !== 'loading'" :class="{ 'is-rotate': topStatus == 'drop' }">↓</span>
          <span v-show="topStatus === 'loading'">
            <mt-spinner type="snake"></mt-spinner>
          </span>
@@ -32,21 +32,14 @@
 <script>
 import reqwest from 'reqwest'
 var inspect = require('util').inspect;
-/*
-{
-  time: '2017-1-7',
-  location: '上海Myst',
-  topic: 'Myst派对',
-  pic: 'http://fj.people.com.cn/NMediaFile/2012/1213/LOCAL201212131737553215239638221.jpg',
-  desc: '哈喽LINE UP: Diplo',
-  link: 'https://www.google.com'
-}*/
+
 export default {
   name: 'articleList',
   data() {
     return {
       loading: false,
       topStatus: '',
+      hasNextPage: true,
       page: 0,
       articles: []
     }
@@ -54,24 +47,44 @@ export default {
   methods: {
     fetchData(callback) {
       console.log('fetchData:', this.page);
-      setTimeout(() => {
-        var dataStr =
-          '{"type":"json","data":[{"startTime":{"__type":"Date","iso":"2016-12-21T00:00:00.000Z"},"name":"Grand Opening Party","endTime":{"__type":"Date","iso":"2016-12-23T00:00:00.000Z"},"thumbnail":"http://img.hb.aicdn.com/dd1b67954189964c129067cb446342205d36b6d1a538-iUAjJY_fw658","lineUp":"Tom Swoon","url":"https://mp.weixin.qq.com/s?__biz=MzI1MjUyNTQzNQ==&mid=2247483680&idx=1&sn=83333cec737d12db71be863ce2ab6633&chksm=e9e32f34de94a6229b1e4898ab486cdfc7522f07fc2473d23937f34aa778a398e39f866f1d23&mpshare=1&scene=1&srcid=12215ZtIc3Al1ND6byDk5jEa&key=564c3e9811aee0ab7d27bb5a024f2424648d9e7326d4b812bccf4c18dbd39b9d2daec22436f22dd87e582e2c84bc47950521db3a496482ca520d555787770e1bcf66bb62cbae2dd0b8c296cd7bae3071&ascene=0&uin=MjQyMTEwOTUwMQ%3D%3D&devicetype=iMac+MacBookPro10%2C1+OSX+OSX+10.12+build(16A323)&version=12010110&nettype=WIFI&fontScale=100&pass_ticket=uEEQajiyO3BDWqhLCgvRUcp0LD6L3w034buIhSpRszkvE0d5lLLBgLFiq4WxG8qy","location":"深圳A8 Sector","objectId":"587eed4bfe88c2002e07ff22","createdAt":"2017-01-18T04:21:31.588Z","updatedAt":"2017-01-18T04:21:31.588Z"},{"startTime":{"__type":"Date","iso":"2016-12-24T00:00:00.000Z"},"name":"Xmas Party","endTime":{"__type":"Date","iso":"2016-12-24T00:00:00.000Z"},"thumbnail":"http://img.hb.aicdn.com/c6880468d1b47f508584f27bfa22820293a46afb1ad0d-YnL2yE_fw658","lineUp":"Jay Hardway","location":"深圳Sky Club","objectId":"587eed4bfe88c2002e07ff23","createdAt":"2017-01-18T04:21:31.598Z","updatedAt":"2017-01-18T04:21:31.598Z"},{"startTime":{"__type":"Date","iso":"2016-12-24T00:00:00.000Z"},"name":"Christmas Eve","endTime":{"__type":"Date","iso":"2016-12-24T00:00:00.000Z"},"thumbnail":"http://img.hb.aicdn.com/ade50ce88bb1d82c57a23adc5e18a664865601bd1099c-P2cqK3_fw658","lineUp":"Carta、Dirty Class","url":"https://mp.weixin.qq.com/s?__biz=MzA3NTc5MjUwMQ==&mid=2652101345&idx=2&sn=cf930e2f9a5202c6e706371f7090ed2c&chksm=848c53fbb3fbdaed1c85e3b59045e7c2ca4e372bf4495a5e1da7a56f0c6e77ba32b8a089e7a9&mpshare=1&scene=1&srcid=12216KbLxC7GK8zPYKyQZGFD&key=564c3e9811aee0abd7374bd11a24da84ee433aa73ed30cda7a5afc887d28e6e1d54475ad1f007efa4fea6779cf639c436a7574543ed865835070c4913bc107e524ba506162b652b78e2e6b175c001fa6&ascene=0&uin=MjQyMTEwOTUwMQ%3D%3D&devicetype=iMac+MacBookPro10%2C1+OSX+OSX+10.12+build(16A323)&version=12010110&nettype=WIFI&fontScale=100&pass_ticket=m2t5PjZSj3qM83UxubuC39pAbPNl6gLfR%2FyivKy8Y6jGN%2FBuVEVMU71f%2BAX%2BFOQM","location":"武汉K歌之王","objectId":"587eed4bfe88c2002e07ff24","createdAt":"2017-01-18T04:21:31.605Z","updatedAt":"2017-01-18T04:21:31.605Z"},{"startTime":{"__type":"Date","iso":"2016-12-24T00:00:00.000Z"},"name":"圣诞电音潮趴","endTime":{"__type":"Date","iso":"2016-12-24T00:00:00.000Z"},"thumbnail":"http://img.hb.aicdn.com/e139ec948d9f95463f3ec1672a4fad41e35434a4b134-eRlBGV_fw658","lineUp":"DJ solaii、poscal dior","url":"https://mp.weixin.qq.com/s?__biz=MzI1MjUyNTQzNQ==&mid=2247483743&idx=1&sn=d634dc9b2b2722519fa284c394c65775&chksm=e9e32f4bde94a65d58627e98c2d03aab3b16d2053c709bc43845f22a1a35d0111dfc3a12023c&mpshare=1&scene=1&srcid=1221b3IOfJRd6s9PrZTphNsP&key=564c3e9811aee0ab25cb1c7a6adc2d3c7898b5d4852fe1249483dc169ab21995c0517021c7de7ba15110b241d91518b51fe1bcf2a4c7626fc1ec21d96dd775d4c6486af741d77d1cd494d10cd82a3eed&ascene=0&uin=MjQyMTEwOTUwMQ%3D%3D&devicetype=iMac+MacBookPro10%2C1+OSX+OSX+10.12+build(16A323)&version=12010110&nettype=WIFI&fontScale=100&pass_ticket=Qo374k%2Bp%2F0mcCwMKqWcJikozfJaOQ%2FsWp9r4cNYNl5KYV2ANR9zES2C7MQm34%2FWY","location":"深圳A8 Sector","objectId":"587eed4bfe88c2002e07ff25","createdAt":"2017-01-18T04:21:31.613Z","updatedAt":"2017-01-18T04:21:31.613Z"},{"startTime":{"__type":"Date","iso":"2016-12-24T00:00:00.000Z"},"name":"Magnet磁场电音派对","endTime":{"__type":"Date","iso":"2016-12-25T00:00:00.000Z"},"lineUp":"Bassjackers、Quintino","url":"https://mp.weixin.qq.com/s?__biz=MzA3NTc5MjUwMQ==&mid=2652101263&idx=1&sn=9becfb01a4a2c7567d8abd7d6bdbe804&chksm=848c5395b3fbda8332b1cbe742ad3ddbee0032d562078310862ecb26fde6aaff3d862e1a60a1&mpshare=1&scene=1&srcid=1221zqgG6bjldAkfiJz2W47L&key=564c3e9811aee0ab2023acb4ce2ab5f6784420656a6ef48154429bfcfc393d27c99251fa52c4ada8f712329ce7dfac66d5c1dd5c653915aa1d99022481a7a32e1a9989ee86c8407d43169317b1074ac9&ascene=0&uin=MjQyMTEwOTUwMQ%3D%3D&devicetype=iMac+MacBookPro10%2C1+OSX+OSX+10.12+build(16A323)&version=12010110&nettype=WIFI&fontScale=100&pass_ticket=uEEQajiyO3BDWqhLCgvRUcp0LD6L3w034buIhSpRszkvE0d5lLLBgLFiq4WxG8qy","location":"深圳南山文体中心","objectId":"587eed4bfe88c2002e07ff26","createdAt":"2017-01-18T04:21:31.622Z","updatedAt":"2017-01-18T04:21:31.622Z"},{"startTime":{"__type":"Date","iso":"2016-12-24T00:00:00.000Z"},"name":"泡泡音乐节","endTime":{"__type":"Date","iso":"2016-12-26T00:00:00.000Z"},"lineUp":"CALVIN Z、LUCKY Z、众国人DJ","url":"https://mp.weixin.qq.com/s?__biz=MzI4OTEyNDk1MA==&mid=2247484067&idx=1&sn=cb682c2523c904c8fade818a38f1a373&chksm=ec32a59adb452c8c309a424e4ab6baadb3b58c3f6b8311c270a25a58891bec71eb7e2f697604&mpshare=1&scene=1&srcid=1221G0n1uDAsUL46IdXQHDdo&key=564c3e9811aee0abb8ae7ef1f5502ce25571fbe73bd9bdb71f3f6cf4d024580685e513a3e514c347fdced74e4a4716454f61c79364fd4cb6f0087fafecbad4322d1891df0cffe1dfc544ecc1484da339&ascene=0&uin=MjQyMTEwOTUwMQ%3D%3D&devicetype=iMac+MacBookPro10%2C1+OSX+OSX+10.12+build(16A323)&version=12010110&nettype=WIFI&fontScale=100&pass_ticket=uEEQajiyO3BDWqhLCgvRUcp0LD6L3w034buIhSpRszkvE0d5lLLBgLFiq4WxG8qy","location":"深圳悦榕湾","objectId":"587eed4bfe88c2002e07ff27","createdAt":"2017-01-18T04:21:31.630Z","updatedAt":"2017-01-18T04:21:31.630Z"},{"startTime":{"__type":"Date","iso":"2016-12-25T00:00:00.000Z"},"name":"Gameface * Blvck","endTime":{"__type":"Date","iso":"2016-12-25T00:00:00.000Z"},"lineUp":"Gameface、Blvck","url":"https://mp.weixin.qq.com/s?__biz=MjM5NDY1OTMwMA==&mid=2649787787&idx=2&sn=6b169a3f6cbcaefc328c673ec2e156d5&chksm=be80430089f7ca16c7fd274d0f1ea1457b4067e2741a8f9ae0dbfb53a94c875520c5d20eb1d3&mpshare=1&scene=1&srcid=1221xZ2IFkt1LyVhhPG96tXS&key=564c3e9811aee0ab3d4f372113d468ee7619431ba3b2048885e43b5a3e6d114d23d8cc313638eaca3f0c2f1c8f7e5fc5744f5f8154d7a691972df938e4ff9903076520539d19a53726e11d0888a4396b&ascene=0&uin=MjQyMTEwOTUwMQ%3D%3D&devicetype=iMac+MacBookPro10%2C1+OSX+OSX+10.12+build(16A323)&version=12010110&nettype=WIFI&fontScale=100&pass_ticket=uEEQajiyO3BDWqhLCgvRUcp0LD6L3w034buIhSpRszkvE0d5lLLBgLFiq4WxG8qy","location":"深圳红糖罐","objectId":"587eed4bfe88c2002e07ff28","createdAt":"2017-01-18T04:21:31.638Z","updatedAt":"2017-01-18T04:21:31.638Z"},{"startTime":{"__type":"Date","iso":"2016-12-27T00:00:00.000Z"},"endTime":{"__type":"Date","iso":"2016-12-27T00:00:00.000Z"},"lineUp":"CALVIN Z","url":"https://mp.weixin.qq.com/s?__biz=MjM5Nzc3MTEwMA==&mid=2650385083&idx=1&sn=f4f367f0a21cbff28312115fe7f1c36c&chksm=bed9e88889ae619e59b787bb91ab5f066e59747ccc2d9dad3fb90ceaa3b2e88622b9ed9710fc&mpshare=1&scene=1&srcid=1222JqF3uTDZ5476fjmq6vgT&key=564c3e9811aee0ab7ee67a1720c14924b288e9f7f9bfa5047f40cc6ef17d199d5eac396ded9eacbf3c4abe9b93749415fe74a3314afe02d8fef03a5b261e86ebd5d42f5c47b5abd72b28eb3c790f7b6f&ascene=0&uin=MjQyMTEwOTUwMQ%3D%3D&devicetype=iMac+MacBookPro11%2C5+OSX+OSX+10.12+build(16A323)&version=12010210&nettype=WIFI&fontScale=100&pass_ticket=7bC5fJ5LT6j%2F5jDsDc8WJ0IALPzIJEiDqu7qQT9MkmC9vw62895s6ZCUAEtWwesu","location":"佛山格莱美汇","objectId":"587eed4bfe88c2002e07ff29","createdAt":"2017-01-18T04:21:31.646Z","updatedAt":"2017-01-18T04:21:31.646Z"},{"startTime":{"__type":"Date","iso":"2016-12-29T00:00:00.000Z"},"endTime":{"__type":"Date","iso":"2016-12-29T00:00:00.000Z"},"lineUp":"Florian Picasso","location":"广州G5乐巢","objectId":"587eed4bfe88c2002e07ff2a","createdAt":"2017-01-18T04:21:31.653Z","updatedAt":"2017-01-18T04:21:31.653Z"},{"startTime":{"__type":"Date","iso":"2016-12-30T00:00:00.000Z"},"name":"XEDM","endTime":{"__type":"Date","iso":"2016-12-30T00:00:00.000Z"},"url":"https://mp.weixin.qq.com/s?__biz=MzI1MjUyNTQzNQ==&mid=2247483744&idx=1&sn=3f55a703d6a98a5dbc78d5c7f298c28f&chksm=e9e32f74de94a662305a58ad242318de93313befd43920dac4a994e4343c93b6e0edd6dcce52&mpshare=1&scene=1&srcid=1221nVqsULoMaBJzBrVtiIW7&key=564c3e9811aee0ab3ade9188616f1fdd3bf2eb803687a43e1cfa178f486287fe022560dce1a300c4a4db814bd1251abb7b32ff81ba0cd6409b3ba9f53355215b8fd6c40abd1982476f727c62c59d2f76&ascene=0&uin=MjQyMTEwOTUwMQ%3D%3D&devicetype=iMac+MacBookPro10%2C1+OSX+OSX+10.12+build(16A323)&version=12010110&nettype=WIFI&fontScale=100&pass_ticket=Qo374k%2Bp%2F0mcCwMKqWcJikozfJaOQ%2FsWp9r4cNYNl5KYV2ANR9zES2C7MQm34%2FWY","location":"深圳A8 Sector","objectId":"587eed4bfe88c2002e07ff2b","createdAt":"2017-01-18T04:21:31.661Z","updatedAt":"2017-01-18T04:21:31.661Z"}],"_metadata":{"page":1,"per_page":10,"page_count":10,"total_count":21,"has_next_page":true}}';
-        var err;
-        var data = this.parseData(dataStr);
-        callback(err, data);
-      }, 1500);
-      // reqwest({
-      //   url: 'http://raveboom.leanapp.cn/event?page=1',
-      //   type: 'json',
-      //   method: 'get',
-      //   error: function(err) {
-      //     console.log(err);
-      //   },
-      //   success: function(resp) {
-      //     console.log(resp);
-      //   }
-      // });
+      var conponent = this;
+      reqwest({
+        url: 'http://raveboom.leanapp.cn/event?page=' + this.page,
+        // url: 'http://localhost:3000/event?page=' + this.page,
+        type: 'json',
+        method: 'get',
+        error: function(err) {
+          console.log(err);
+          callback(err, undefined);
+        },
+        success: function(data) {
+          console.log(data);
+          conponent.hasNextPage = data._metadata.has_next_page;
+          var articles = [];
+          for (var i = 0; i < data.data.length; i++) {
+            var item = data.data[i];
+            var article = {
+              link: item.url,
+              pic_url: item.thumbnail,
+              location: item.location,
+              topic: item.name,
+              desc: 'Line Up:' + item.lineUp
+            };
+            var startTime = new Date(item.startTime.iso)
+            var time = startTime.getFullYear() + '.' + (startTime.getMonth() + 1) + '.' + startTime.getDate();
+            if (item.endTime) {
+              var endTime = new Date(item.endTime.iso);
+              var endStr = endTime.getFullYear() + '.' + (endTime.getMonth() + 1) + '.' + endTime.getDate();
+              if (time !== endStr) {
+                time += '-' + endStr;
+              }
+            }
+            article['time'] = time;
+            articles.push(article);
+          }
+          callback(null, articles);
+        }
+      });
     },
     handleReloadChange(status) {
       this.topStatus = status;
@@ -80,15 +93,21 @@ export default {
     reload() {
       console.log('pullToRefresh');
       var conponent = this;
+      conponent.hasNextPage = true;
       this.page = 1;
       this.fetchData(function(err, data) {
         console.log('onTopLoaded');
         conponent.articles = data;
-        // conponent.$refs.pullToRefresh.onTopLoaded();
+        conponent.$refs.pullToRefresh.onTopLoaded();
       });
     },
     loadMore() {
       console.log("loadMore");
+      if (!this.hasNextPage) {
+        console.log("no more pate");
+        this.loading = false;
+        return;
+      }
       this.loading = true;
       this.page += 1;
       var conponent = this;
@@ -101,31 +120,7 @@ export default {
       location.href = this.articles[index].link;
     },
     parseData(jsonStr) {
-      console.log('parseData');
-      var data = JSON.parse(jsonStr);
-      var articles = [];
-      for (var i = 0; i < data.data.length; i++) {
-        var item = data.data[i];
-        var article = {
-          link: item.url,
-          pic_url: item.thumbnail,
-          location: item.location,
-          topic: item.name,
-          desc: 'Line Up:' + item.lineUp
-        };
-        var startTime = new Date(item.startTime.iso)
-        var time = startTime.getFullYear() + '.' + (startTime.getMonth() + 1) + '.' + startTime.getDate();
-        if (item.endTime) {
-          var endTime = new Date(item.endTime.iso);
-          var endStr = endTime.getFullYear() + '.' + (endTime.getMonth() + 1) + '.' + endTime.getDate();
-          if (time !== endStr) {
-            time += '-' + endStr;
-          }
-        }
-        article['time'] = time;
-        articles.push(article);
-      }
-      console.log(articles);
+
       return articles;
     }
   }
