@@ -1,6 +1,6 @@
 <template lang="html">
   <div id="list">
-    <mt-loadmore :top-method="reload" @top-status-change="handleReloadChange" ref="pullToRefresh">
+    <mt-loadmore>
       <ul v-infinite-scroll="loadMore" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
         <li class="article" v-for="(article, index) in articles" v-on:click="jumpTo(index)">
             <div class="title-pic">
@@ -49,16 +49,14 @@ export default {
       console.log('fetchData:', this.page);
       var conponent = this;
       reqwest({
-        url: 'http://raveboom.leanapp.cn/event?page=' + this.page,
-        // url: 'http://localhost:3000/event?page=' + this.page,
+        // url: 'http://raveboom.leanapp.cn/event?page=' + this.page,
+        url: 'http://localhost:3000/event?page=' + this.page,
         type: 'json',
         method: 'get',
         error: function(err) {
-          console.log(err);
           callback(err, undefined);
         },
         success: function(data) {
-          console.log(data);
           conponent.hasNextPage = data._metadata.has_next_page;
           var articles = [];
           for (var i = 0; i < data.data.length; i++) {
@@ -88,23 +86,19 @@ export default {
     },
     handleReloadChange(status) {
       this.topStatus = status;
-      console.log(status);
     },
     reload() {
-      console.log('pullToRefresh');
       var conponent = this;
       conponent.hasNextPage = true;
       this.page = 1;
       this.fetchData(function(err, data) {
-        console.log('onTopLoaded');
+        if (err) return;
         conponent.articles = data;
         conponent.$refs.pullToRefresh.onTopLoaded();
       });
     },
     loadMore() {
-      console.log("loadMore");
       if (!this.hasNextPage) {
-        console.log("no more pate");
         this.loading = false;
         return;
       }
@@ -112,16 +106,13 @@ export default {
       this.page += 1;
       var conponent = this;
       this.fetchData(function functionName(err, data) {
+        if (err) return;
         conponent.articles = conponent.articles.concat(data);
         conponent.loading = false;
       });
     },
     jumpTo(index) {
       location.href = this.articles[index].link;
-    },
-    parseData(jsonStr) {
-
-      return articles;
     }
   }
 }
