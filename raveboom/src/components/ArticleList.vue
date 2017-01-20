@@ -1,7 +1,7 @@
 <template lang="html">
   <div id="list">
-    <mt-loadmore>
-      <ul v-infinite-scroll="loadMore" infinite-scroll-disabled="loading" infinite-scroll-distance="10">
+      <mt-loadmore id="loadmore" :top-method="reload" @top-status-change="handleReloadChange" ref="pullToRefresh">
+        <ul v-infinite-scroll="loadMore" infinite-scroll-disabled="disableInfinite" infinite-scroll-distance="10">
         <li class="article" v-for="(article, index) in articles" v-on:click="jumpTo(index)">
             <div class="title-pic">
               <img v-bind:src="article.pic_url" />
@@ -16,14 +16,14 @@
             <div class="desc">{{ article.desc }}</div>
         </li>
       </ul>
-      <div slot="top" class="mint-loadmore-top">
+      <div slot="top" class="mint-loadmore-top" :class="{ 'min-height': articles.length == 0 && isFetched}">
         <span v-show="topStatus !== 'loading'" :class="{ 'is-rotate': topStatus == 'drop' }">↓</span>
          <span v-show="topStatus === 'loading'">
            <mt-spinner type="snake"></mt-spinner>
          </span>
       </div>
     </mt-loadmore>
-    <div id="infinite_container" v-show="loading" class="infinite-container">
+    <div id="infinite_container" v-show="showInfiniteLoading" class="infinite-container">
         <mt-spinner type="double-bounce"></mt-spinner>
     </div>
   </div>
@@ -32,12 +32,16 @@
 <script>
 import reqwest from 'reqwest'
 var inspect = require('util').inspect;
-
+import {
+  Toast
+} from 'mint-ui';
 export default {
   name: 'articleList',
   data() {
     return {
-      loading: false,
+      isFetched : false,
+      showInfiniteLoading: false,
+      disableInfinite: false,
       topStatus: '',
       hasNextPage: true,
       page: 0,
@@ -49,14 +53,16 @@ export default {
       console.log('fetchData:', this.page);
       var conponent = this;
       reqwest({
-        // url: 'http://raveboom.leanapp.cn/event?page=' + this.page,
-        url: 'http://localhost:3000/event?page=' + this.page,
+        url: 'https://raveboom.leanapp.cn/event?page=' + this.page,
+        // url: 'http://localhost:3000/event?page=' + this.page,
         type: 'json',
         method: 'get',
         error: function(err) {
+          conponent.isFetched = true;
           callback(err, undefined);
         },
         success: function(data) {
+          conponent.isFetched = true;
           conponent.hasNextPage = data._metadata.has_next_page;
           var articles = [];
           for (var i = 0; i < data.data.length; i++) {
@@ -88,27 +94,37 @@ export default {
       this.topStatus = status;
     },
     reload() {
+      console.log('reload');
       var conponent = this;
       conponent.hasNextPage = true;
       this.page = 1;
       this.fetchData(function(err, data) {
-        if (err) return;
+        if (err) {
+          Toast('网络错误');
+          conponent.$refs.pullToRefresh.onTopLoaded();
+          return;
+        }
         conponent.articles = data;
+        conponent.disableInfinite = false;
         conponent.$refs.pullToRefresh.onTopLoaded();
       });
     },
     loadMore() {
+      this.disableInfinite = true;
       if (!this.hasNextPage) {
-        this.loading = false;
+        this.showInfiniteLoading = false;
         return;
       }
-      this.loading = true;
+      this.showInfiniteLoading = true;
       this.page += 1;
       var conponent = this;
       this.fetchData(function functionName(err, data) {
-        if (err) return;
+        if (err) {
+          conponent.showInfiniteLoading = false;
+          return;
+        };
         conponent.articles = conponent.articles.concat(data);
-        conponent.loading = false;
+        conponent.disableInfinite = false;
       });
     },
     jumpTo(index) {
@@ -126,6 +142,10 @@ li {
 
 ul {
   padding: 0px;
+}
+
+#loadmore .mint-loadmore-content {
+  min-height: 500px;
 }
 
 .article {
@@ -204,6 +224,10 @@ ul {
 #infinite_container span {
   display: inline-block;
   vertical-align: middle;
+}
+
+.min-height {
+  min-height: 200px;
 }
 
 .mint-loadmore-top span {
