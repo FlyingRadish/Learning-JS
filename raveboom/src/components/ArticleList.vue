@@ -144,10 +144,6 @@ ul {
   padding: 0px;
 }
 
-#loadmore .mint-loadmore-content {
-  min-height: 500px;
-}
-
 .article {
   position: relative;
   list-style: none;
